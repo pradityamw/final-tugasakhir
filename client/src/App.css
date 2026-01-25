@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+::-webkit-scrollbar {
+  width: 8px; /* Ubah lebar scrollbar sesuai kebutuhan */
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Warna latar belakang track */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; /* Warna pegangan scrollbar */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; /* Warna pegangan scrollbar saat hover */
+}
