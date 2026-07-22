@@ -5,6 +5,7 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import ReactQuill from "react-quill";
 import iziToast from "izitoast";
 import { useNavigate, useParams } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   useEditProductMutation,
   useGetProductQuery,
@@ -138,6 +139,16 @@ const EditProduct = () => {
       <AdminBar />
 
       <Grid container sx={{ position: "relative", top: 70, minHeight: "80vh" }}>
+        <Grid item xs={12} sx={{ px: { xs: 1, md: 4 }, pt: 2 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(-1)}
+            variant="text"
+            sx={{ textTransform: "none" }}
+          >
+            Kembali
+          </Button>
+        </Grid>
         <Grid
           item
           xs={12}

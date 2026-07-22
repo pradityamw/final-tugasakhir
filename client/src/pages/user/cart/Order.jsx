@@ -58,7 +58,7 @@ const Order = ({ subtotal, totalWeight, products }) => {
         weight: totalWeight,
         courier: selectedCourier,
       },
-      { skip: !selectedCity || !totalWeight || !selectedCourier }
+      { skip: !selectedDistrict || totalWeight === "" || !selectedCourier }
     );
 
   const services = servicesData;

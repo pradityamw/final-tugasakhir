@@ -1,14 +1,16 @@
-import { Box, IconButton, Typography } from "@mui/material";
+import { Box, Button, IconButton, Typography } from "@mui/material";
 import Appbar from "../../../components/appbar/Appbar";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Order from "./Order";
 import {
   useDeleteProductMutation,
   useMyCartQuery,
 } from "../../../state/api/cartApi";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import iziToast from "izitoast";
 import Title from "../../../components/title/Title";
 import Protect from "../Protect";
@@ -16,6 +18,7 @@ import Chat from "../chat/Chat";
 
 const Cart = () => {
   Protect();
+  const navigate = useNavigate();
 
   const defaultImg = "http://dummyimage.com/650x650.png/cc0000/ffffff";
 
@@ -121,14 +124,14 @@ const Cart = () => {
   const calculateTotalPrice = () => {
     return Object.values(price).reduce(
       (acc, currentPrice) => acc + currentPrice,
-      0
+      0,
     );
   };
 
   const calculateTotalWeight = () => {
     return Object.values(weight).reduce(
       (acc, currentWeight) => acc + currentWeight,
-      0
+      0,
     );
   };
 
@@ -146,6 +149,16 @@ const Cart = () => {
       <Title title={"Keranjang Belanja"} />
       <Appbar />
       <Box sx={{ margin: "30px" }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate(-1)}
+            variant="text"
+            sx={{ textTransform: "none", color: "text.secondary" }}
+          >
+            Kembali
+          </Button>
+        </Box>
         <Typography variant="h6" fontWeight="bold">
           Kerangjang Belanja
         </Typography>
@@ -196,7 +209,7 @@ const Cart = () => {
                         {product?.productId.name}
                       </Typography>
                       <Typography fontWeight="bold">{`Rp ${parseFloat(
-                        price[product?.productId._id]
+                        price[product?.productId._id],
                       ).toLocaleString("id-ID")}`}</Typography>
                       <Typography fontSize={14} fontStyle="italic">
                         {weight[product?.productId._id]} gram
@@ -256,7 +269,7 @@ const Cart = () => {
                 </Box>
               ))
             ) : (
-              <Typography>Yek isi kerangkang Belanja kamu</Typography>
+              <Typography>Yuk isi keranjang Belanja kamu</Typography>
             )}
           </Box>
 

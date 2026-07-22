@@ -94,9 +94,12 @@ const ReportTable = ({ orders, start, end }) => {
 
   return (
     <Fragment>
-      <Box sx={{ display: "flex", justifyContent: "end", mb: 1 }}>
+      <Box sx={{ display: "flex", justifyContent: "end", mb: 1, gap: 1 }} className="no-print">
         <Button variant="contained" color="success" onClick={convertToExcel}>
           download
+        </Button>
+        <Button variant="contained" color="primary" onClick={() => window.print()}>
+          Cetak PDF
         </Button>
       </Box>
       <Paper>

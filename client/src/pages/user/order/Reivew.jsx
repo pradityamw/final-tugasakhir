@@ -1,6 +1,7 @@
-import { Box, Button, Fade, Modal, Rating, Stack } from "@mui/material";
+import { Box, Button, Fade, IconButton, Modal, Rating, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import ReactQuill from "react-quill";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useGiveReviewMutation } from "../../../state/api/productApi";
 import iziToast from "izitoast";
 import { useSelector } from "react-redux";
@@ -77,13 +78,21 @@ const Reivew = ({ open, close, product }) => {
             left: "50%",
             transform: "translate(-50%, -50%)",
             width: { xs: 350, md: 450 },
-            height: 340,
+            height: 380,
             bgcolor: "background.paper",
             boxShadow: 24,
             borderRadius: "5px",
             p: 2,
           }}
         >
+          <Box sx={{ display: "flex", alignItems: "center", mb: 1, gap: 1 }}>
+            <IconButton size="small" onClick={close} aria-label="back">
+              <ArrowBackIcon fontSize="small" />
+            </IconButton>
+            <Typography variant="subtitle1" fontWeight="bold">
+              Tulis Ulasan
+            </Typography>
+          </Box>
           <form
             style={{
               display: "flex",

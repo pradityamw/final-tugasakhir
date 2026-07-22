@@ -6,12 +6,15 @@ export const productApi = createApi({
     baseUrl: `${import.meta.env.VITE_BASE_URL}/products`,
     credentials: "include",
   }),
+  tagTypes: ["Products", "Product"],
   endpoints: (builder) => ({
     getProducts: builder.query({
       query: () => "/show-products",
+      providesTags: ["Products"],
     }),
     getProduct: builder.query({
       query: (name) => `${name}`,
+      providesTags: (result, error, name) => [{ type: "Product", id: name }, "Products"],
     }),
     giveReview: builder.mutation({
       query: ({ id, body }) => ({
@@ -19,36 +22,21 @@ export const productApi = createApi({
         method: "POST",
         body,
       }),
+      invalidatesTags: ["Products", "Product"],
     }),
     deleteProduct: builder.mutation({
       query: (id) => ({
         url: `/delete/${id}`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          productApi.endpoints.getProducts.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Products", "Product"],
     }),
     deleteProducts: builder.mutation({
       query: (id) => ({
         url: `/delete-all`,
         method: "DELETE",
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          productApi.endpoints.getProducts.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Products", "Product"],
     }),
     addProduct: builder.mutation({
       query: (body) => ({
@@ -56,15 +44,7 @@ export const productApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          productApi.endpoints.getProducts.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Products"],
     }),
     editProduct: builder.mutation({
       query: ({ body, id }) => ({
@@ -72,15 +52,7 @@ export const productApi = createApi({
         method: "PUT",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          productApi.endpoints.getProducts.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Products", "Product"],
     }),
     uploadProducts: builder.mutation({
       query: (body) => ({
@@ -88,15 +60,7 @@ export const productApi = createApi({
         method: "POST",
         body,
       }),
-      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
-        await queryFulfilled;
-
-        await dispatch(
-          productApi.endpoints.getProducts.initiate(undefined, {
-            forceRefetch: true,
-          })
-        );
-      },
+      invalidatesTags: ["Products", "Product"],
     }),
   }),
 });

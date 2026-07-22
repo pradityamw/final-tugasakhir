@@ -44,7 +44,7 @@ const SelectOptions = ({
           label="Provinsi"
           onChange={(e) => {
             const selectedId = e.target.value;
-            const selectedOption = provinces.find((p) => p.id === selectedId);
+            const selectedOption = provinces.find((p) => p.id == selectedId);
             onProvinceChange(selectedOption);
           }}
           disabled={isProvincesLoading}
@@ -68,7 +68,7 @@ const SelectOptions = ({
           label="Kota / Kabupaten"
           onChange={(e) => {
             const selectedId = e.target.value;
-            const selectedOption = cities.find((c) => c.id === selectedId);
+            const selectedOption = cities.find((c) => c.id == selectedId);
             onCityChange(selectedOption);
           }}
           disabled={!selectedProvinceValue || isCitiesLoading}
@@ -96,7 +96,7 @@ const SelectOptions = ({
           label="Kecamatan"
           onChange={(e) => {
             const selectedId = e.target.value;
-            const selectedOption = districts.find((d) => d.id === selectedId);
+            const selectedOption = districts.find((d) => d.id == selectedId);
             onDistrictChange(selectedOption);
           }}
           disabled={!selectedCityValue || isDistrictsLoading}

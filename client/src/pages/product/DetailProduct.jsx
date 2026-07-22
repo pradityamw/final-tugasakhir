@@ -6,9 +6,10 @@ import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { orange } from "@mui/material/colors";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useState } from "react";
 import Order from "./Order";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useGetProductQuery } from "../../state/api/productApi";
 import Title from "../../components/title/Title";
 import Reviews from "./Reviews";
@@ -19,6 +20,7 @@ const createMarkUp = (html) => {
 
 const DetailProduct = () => {
   const params = useParams();
+  const navigate = useNavigate();
 
   const defaultImg = "http://dummyimage.com/650x650.png/cc0000/ffffff";
 
@@ -40,6 +42,19 @@ const DetailProduct = () => {
     <Box>
       <Title title={`${params?.name}`} />
       <Appbar />
+
+      {/* Tombol Kembali */}
+      <Box sx={{ px: { xs: 2, md: 4 }, pt: 1 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate(-1)}
+          variant="text"
+          sx={{ textTransform: "none", color: "text.secondary" }}
+        >
+          Kembali
+        </Button>
+      </Box>
+
       <Box
         sx={{
           display: "flex",

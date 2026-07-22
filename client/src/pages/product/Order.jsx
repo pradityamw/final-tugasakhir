@@ -72,7 +72,7 @@ const Order = ({ product }) => {
         weight: totalWeight,
         courier: selectedCourier,
       },
-      { skip: !selectedCity || !totalWeight || !selectedCourier }
+      { skip: !selectedDistrict || totalWeight === "" || !selectedCourier }
     );
 
   const [
@@ -125,6 +125,7 @@ const Order = ({ product }) => {
     if (qty < product?.stock) {
       setQty(qty + 1);
       setSubtotal(product?.price * (qty + 1));
+      setTotalWeight(product?.weight * (qty + 1));
     }
   };
 
@@ -132,6 +133,7 @@ const Order = ({ product }) => {
     if (qty > 1) {
       setQty(qty - 1);
       setSubtotal(product?.price * (qty - 1));
+      setTotalWeight(product?.weight * (qty - 1));
     }
   };
 

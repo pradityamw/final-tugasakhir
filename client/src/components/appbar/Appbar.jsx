@@ -3,10 +3,11 @@ import Box from "@mui/material/Box";
 import Badge from "@mui/material/Badge";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import LoginIcon from "@mui/icons-material/Login";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Menu, MenuItem } from "@mui/material";
+import { Avatar, Menu, MenuItem } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -58,6 +59,8 @@ const Appbar = () => {
 
   const toHome = () => navigate("/");
 
+  const goBack = () => navigate(-1);
+
   const toLoginPage = () => navigate("/login");
 
   const toPage = (link) => {
@@ -105,8 +108,16 @@ const Appbar = () => {
                   </Badge>
                 </IconButton>
 
-                <IconButton color="inherit" onClick={menuOpen}>
-                  <AccountCircleIcon />
+                <IconButton color="inherit" onClick={menuOpen} sx={{ p: 0.5 }}>
+                  {user?.avatar ? (
+                    <Avatar
+                      src={user.avatar}
+                      alt={user.name}
+                      sx={{ width: 32, height: 32 }}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
                 </IconButton>
                 <Menu
                   id="menu-appbar"
@@ -134,8 +145,16 @@ const Appbar = () => {
               </>
             ) : user?.role === "admin" ? (
               <>
-                <IconButton color="inherit" onClick={menuOpen}>
-                  <AccountCircleIcon />
+                <IconButton color="inherit" onClick={menuOpen} sx={{ p: 0.5 }}>
+                  {user?.avatar ? (
+                    <Avatar
+                      src={user.avatar}
+                      alt={user.name}
+                      sx={{ width: 32, height: 32 }}
+                    />
+                  ) : (
+                    <AccountCircleIcon />
+                  )}
                 </IconButton>
                 <Menu
                   id="menu-appbar"

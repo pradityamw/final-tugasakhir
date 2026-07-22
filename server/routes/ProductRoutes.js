@@ -179,6 +179,13 @@ router.put(
           image: images.map((link) => ({ link })),
         };
       } else {
+        let imageList = [];
+        if (Array.isArray(image)) {
+          imageList = image;
+        } else if (typeof image === "string" && image.trim() !== "") {
+          imageList = [image];
+        }
+
         data = {
           name: name,
           desc: desc,
@@ -188,7 +195,7 @@ router.put(
           profit: profit,
           stock: stock,
           weight: weight,
-          image: image.map((link) => ({ link })),
+          image: imageList.map((link) => ({ link })),
         };
       }
 

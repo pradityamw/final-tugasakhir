@@ -1,5 +1,6 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import GoogleIcon from "@mui/icons-material/Google";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import Title from "../../components/title/Title";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -78,7 +79,7 @@ const Signup = () => {
       <Box
         sx={{
           width: 1000,
-          height: 550,
+          height: 600,
           display: "flex",
           borderRadius: "5px",
           boxShadow: 4,
@@ -98,10 +99,28 @@ const Signup = () => {
             display: "flex",
             flexDirection: "column",
             p: 4,
-            gap: 2,
+            gap: 1.5,
           }}
         >
-          <Typography variant="h6" fontWeight="bold">
+          <Button
+            startIcon={<ArrowBackIcon />}
+            onClick={() => navigate("/login")}
+            sx={{
+              alignSelf: "flex-start",
+              textTransform: "none",
+              color: "text.secondary",
+              p: 0,
+              minWidth: 0,
+              "&:hover": {
+                color: "primary.main",
+                backgroundColor: "transparent",
+              },
+            }}
+          >
+            Kembali ke Login
+          </Button>
+
+          <Typography variant="h6" fontWeight="bold" sx={{ mt: 0.5 }}>
             Daftar
           </Typography>
           <Typography variant="body2">

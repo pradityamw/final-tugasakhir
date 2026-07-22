@@ -21,9 +21,21 @@ const ReportPage = () => {
 
   const { data: orders } = useGetOrdersQuery();
 
+  // Mulai dari awal bulan ini jam 00:00:00.000
+  const getDefaultStartDate = () => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1, 0, 0, 0, 0);
+  };
+
+  // Sampai akhir hari ini jam 23:59:59.999
+  const getDefaultEndDate = () => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
+  };
+
   const [today, setToday] = useState(new Date());
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(getDefaultStartDate());
+  const [endDate, setEndDate] = useState(getDefaultEndDate());
 
   const dateString = format(today, "dd MM yyyy", { locale: idLocale });
   const startString = format(startDate, "dd MM yyyy", { locale: idLocale });
@@ -45,6 +57,22 @@ const ReportPage = () => {
 
   const filteredOrders = ordersByDate();
 
+  const handleStartDateChange = (date) => {
+    if (date) {
+      const newDate = new Date(date);
+      newDate.setHours(0, 0, 0, 0);
+      setStartDate(newDate);
+    }
+  };
+
+  const handleEndDateChange = (date) => {
+    if (date) {
+      const newDate = new Date(date);
+      newDate.setHours(23, 59, 59, 999);
+      setEndDate(newDate);
+    }
+  };
+
   useEffect(() => {
     setToday(new Date());
   }, []);
@@ -52,11 +80,13 @@ const ReportPage = () => {
   return (
     <Fragment>
       <Title title={"Admin Laporan"} />
-      <AdminBar />
+      <Box className="no-print">
+        <AdminBar />
+      </Box>
 
-      <Box sx={{ position: "relative", top: 70 }}>
+      <Box sx={{ position: "relative", top: 70 }} className="print-area">
         {/* Function */}
-        <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }}>
+        <Box sx={{ p: 2, display: "flex", justifyContent: "space-between" }} className="no-print">
           <Box
             sx={{ display: "flex", width: 400, justifyContent: "space-evenly" }}
           >
@@ -68,7 +98,7 @@ const ReportPage = () => {
               <DatePicker
                 closeOnScroll={true}
                 selected={startDate}
-                onChange={(date) => setStartDate(date)}
+                onChange={handleStartDateChange}
                 customInput={<DateButton />}
                 dateFormat="dd MM yyyy"
                 maxDate={today}
@@ -83,7 +113,7 @@ const ReportPage = () => {
               <DatePicker
                 closeOnScroll={true}
                 selected={endDate}
-                onChange={(date) => setEndDate(date)}
+                onChange={handleEndDateChange}
                 customInput={<DateButton />}
                 dateFormat="dd MM yyyy"
                 maxDate={today}

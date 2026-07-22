@@ -111,11 +111,23 @@ const LoginPage = () => {
           <Typography variant="h6" fontWeight="bold">
             Login
           </Typography>
-          <Typography>
-            Belum punya akun?
-            <span onClick={toSignUp} style={{ cursor: "pointer" }}>
+          <Typography variant="body2" sx={{ color: "text.secondary", mt: 0.5 }}>
+            Belum punya akun?{" "}
+            <Typography
+              component="span"
+              variant="body2"
+              onClick={toSignUp}
+              sx={{
+                color: "primary.main",
+                cursor: "pointer",
+                fontWeight: "bold",
+                "&:hover": {
+                  textDecoration: "underline",
+                },
+              }}
+            >
               Daftar
-            </span>
+            </Typography>
           </Typography>
 
           <form

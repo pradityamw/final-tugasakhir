@@ -1,6 +1,8 @@
 import { Fragment, useEffect, useState } from "react";
 import Appbar from "../../components/appbar/Appbar";
 import { Avatar, Box, Button, TextField } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   loadUser,
@@ -20,6 +22,7 @@ import Protect from "./Protect";
 
 const Profile = () => {
   Protect();
+  const navigate = useNavigate();
 
   const dispatch = useDispatch();
 
@@ -154,6 +157,16 @@ const Profile = () => {
     <Fragment>
       <Title title={`Profile ${user?.name}`} />
       <Appbar />
+      <Box sx={{ px: { xs: 2, md: 4 }, pt: 1 }}>
+        <Button
+          startIcon={<ArrowBackIcon />}
+          onClick={() => navigate(-1)}
+          variant="text"
+          sx={{ textTransform: "none", color: "text.secondary" }}
+        >
+          Kembali
+        </Button>
+      </Box>
       <Box
         sx={{
           position: "relative",
