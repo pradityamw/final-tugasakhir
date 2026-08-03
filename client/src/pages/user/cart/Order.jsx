@@ -10,13 +10,15 @@ import {
 import { useSelector } from "react-redux";
 import { useGetTokenMutation } from "../../../state/api/paymentApi"; // Sesuaikan path ini
 import { useCartOrderMutation } from "../../../state/api/orderApi"; // Sesuaikan path ini
+import { useNavigate } from "react-router-dom";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
 const Order = ({ subtotal, totalWeight, products }) => {
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const [getToken, { isLoading, data: tokenData }] = useGetTokenMutation();
-  const [cartOrder, { isSuccess, reset }] = useCartOrderMutation();
+  const [cartOrder, { isSuccess, data: orderResponse, reset }] = useCartOrderMutation();
 
   // --- State terpusat untuk semua pilihan ---
   const [selectedProvince, setSelectedProvince] = useState("");
@@ -160,7 +162,7 @@ const Order = ({ subtotal, totalWeight, products }) => {
             payment: total,
             paymentStatus: result.transaction_status,
             shipment: shipment,
-            shippingCost: cost,
+            shippingCost: shippingCost,
             courier: `${selectedService?.code} - ${selectedService?.service}`,
             products: products?.map((product) => ({
               productId: product.productId,
@@ -171,13 +173,11 @@ const Order = ({ subtotal, totalWeight, products }) => {
           };
 
           cartOrder(data);
-
-          // window.location.href = "/confirmation";
         },
         onError: (error) => {
           iziToast.error({
             title: "Error",
-            message: error,
+            message: typeof error === "string" ? error : "Pembayaran gagal",
             position: "topRight",
             timeout: 3000,
           });
@@ -212,9 +212,16 @@ const Order = ({ subtotal, totalWeight, products }) => {
 
   useEffect(() => {
     if (isSuccess) {
+      iziToast.success({
+        title: "Success",
+        message: orderResponse?.message || "Pesanan berhasil dibuat",
+        position: "topRight",
+        timeout: 3000,
+      });
       reset();
+      navigate("/");
     }
-  }, [isSuccess, reset]);
+  }, [isSuccess, orderResponse, reset, navigate]);
 
   return (
     <Box

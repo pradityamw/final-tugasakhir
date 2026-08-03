@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { cartApi } from "./cartApi";
 
 export const orderApi = createApi({
   reducerPath: "orderApi",
@@ -20,6 +21,14 @@ export const orderApi = createApi({
         method: "POST",
         body,
       }),
+      async onQueryStarted(queryArg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          await dispatch(
+            cartApi.endpoints.myCart.initiate(undefined, { forceRefetch: true })
+          );
+        } catch (e) {}
+      },
     }),
     getMyOrder: builder.mutation({
       query: () => "/my-order",

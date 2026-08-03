@@ -22,11 +22,13 @@ import iziToast from "izitoast";
 import { useGetTokenMutation } from "../../state/api/paymentApi";
 import { useCreateOrderMutation } from "../../state/api/orderApi";
 import { useCreateCartMutation } from "../../state/api/cartApi";
+import { useNavigate } from "react-router-dom";
 
 const Order = ({ product }) => {
+  const navigate = useNavigate();
   const { isAuth, user } = useSelector((state) => state.auth);
   const [getToken, { isLoading, data: tokenData }] = useGetTokenMutation();
-  const [createOrder, { isSuccess, reset }] = useCreateOrderMutation();
+  const [createOrder, { isSuccess, data: orderData, reset }] = useCreateOrderMutation();
 
   const [qty, setQty] = useState(1);
   const [subtotal, setSubtotal] = useState(0);
@@ -229,7 +231,7 @@ const Order = ({ product }) => {
             payment: total,
             paymentStatus: result.transaction_status,
             shipment: shipment,
-            shippingCost: cost,
+            shippingCost: shippingCost,
             courier: `${selectedService?.code} - ${selectedService?.service}`,
             products: [
               {
@@ -242,13 +244,11 @@ const Order = ({ product }) => {
           };
 
           createOrder(data);
-
-          window.location.href = "/confirmation";
         },
         onError: (error) => {
           iziToast.error({
             title: "Error",
-            message: error,
+            message: typeof error === "string" ? error : "Pembayaran gagal",
             position: "topRight",
             timeout: 3000,
           });
@@ -283,9 +283,16 @@ const Order = ({ product }) => {
 
   useEffect(() => {
     if (isSuccess) {
+      iziToast.success({
+        title: "Success",
+        message: orderData?.message || "Pesanan berhasil dibuat",
+        position: "topRight",
+        timeout: 3000,
+      });
       reset();
+      navigate("/");
     }
-  }, [isSuccess, reset]);
+  }, [isSuccess, orderData, reset, navigate]);
 
   useEffect(() => {
     if (cartSuccess) {
