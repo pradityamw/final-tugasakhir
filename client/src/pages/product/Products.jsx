@@ -1,6 +1,5 @@
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import {
   Box,
@@ -17,6 +16,7 @@ import { orange } from "@mui/material/colors";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useGetProductsQuery } from "../../state/api/productApi";
+import NgrokImage from "../../components/NgrokImage";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -132,11 +132,10 @@ const Products = () => {
             onClick={() => detailProductPage(product.name)}
           >
             <CardActionArea>
-              <CardMedia
-                component="img"
+              <NgrokImage
+                src={product.image[0] ? product.image[0].link : defaultImg}
                 alt={product.name}
-                image={product.image[0] ? product.image[0].link : defaultImg}
-                sx={{ height: "300px", objectFit: "cover" }}
+                style={{ height: "300px", width: "100%", objectFit: "cover" }}
               />
             </CardActionArea>
             <CardContent>

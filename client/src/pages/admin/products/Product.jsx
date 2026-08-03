@@ -12,6 +12,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import { useState } from "react";
+import NgrokImage from "../../../components/NgrokImage";
 
 const createMarkUp = (html) => {
   return { __html: html };
@@ -79,7 +80,7 @@ const Product = ({ open, close, productDetail, reset }) => {
                   justifyContent: "center",
                 }}
               >
-                <img
+                <NgrokImage
                   src={
                     product?.image[imageIndex]
                       ? product?.image[imageIndex].link

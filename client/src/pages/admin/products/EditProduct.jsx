@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
+import NgrokImage from "../../../components/NgrokImage";
 import AdminBar from "../components/appbar/AdminBar";
 import { Box, Button, Grid, TextField, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -250,11 +251,10 @@ const EditProduct = () => {
                 ))
               ) : previewImg?.length > 0 ? (
                 previewImg.map((img, index) => (
-                  <img
+                  <NgrokImage
                     key={index}
                     src={img.link}
                     alt={`Preview ${index}`}
-                    loading="lazy"
                     style={{ height: 140, width: 140, objectFit: "cover" }}
                     onClick={() => removeImg(index)}
                   />

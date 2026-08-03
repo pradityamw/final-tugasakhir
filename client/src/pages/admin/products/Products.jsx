@@ -4,7 +4,6 @@ import {
   CardActionArea,
   CardActions,
   CardContent,
-  CardMedia,
   IconButton,
   Rating,
   Stack,
@@ -23,6 +22,7 @@ import iziToast from "izitoast";
 import CircularProgress from "@mui/material/CircularProgress";
 import Product from "./Product";
 import { useNavigate } from "react-router-dom";
+import NgrokImage from "../../../components/NgrokImage";
 import Reviews from "./Reviews";
 
 const Products = ({ product }) => {
@@ -86,15 +86,14 @@ const Products = ({ product }) => {
   return (
     <Card sx={{ width: { xs: 150, md: 200 } }}>
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height={150}
-          image={
+        <NgrokImage
+          src={
             product.image && product.image[0]
               ? product.image[0].link
               : defaultImg
           }
-          sx={{ "&:hover": { cursor: "pointer" } }}
+          alt={product.name}
+          style={{ height: 150, width: "100%", objectFit: "cover", cursor: "pointer" }}
           onClick={() => detailHanlder(product.name)}
         />
       </CardActionArea>

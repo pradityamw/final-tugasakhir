@@ -1,5 +1,6 @@
 import { Box, Button, IconButton, Typography } from "@mui/material";
 import Appbar from "../../../components/appbar/Appbar";
+import NgrokImage from "../../../components/NgrokImage";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -183,7 +184,7 @@ const Cart = () => {
                       gap: "20px",
                     }}
                   >
-                    <img
+                    <NgrokImage
                       src={
                         product?.productId.image[0]
                           ? product?.productId.image[0].link

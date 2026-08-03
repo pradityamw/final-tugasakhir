@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,7 +44,16 @@ app.use(cookieParser());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "upload")));
+app.use(
+  express.static(path.join(__dirname, "upload"), {
+    setHeaders: (res, filePath) => {
+      res.setHeader("Access-Control-Allow-Origin", process.env.DOMAIN);
+      res.setHeader("Access-Control-Allow-Credentials", "true");
+      res.setHeader("ngrok-skip-browser-warning", "true");
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
 
 app.use(
   session({
@@ -95,6 +105,31 @@ passport.use(
 );
 app.use("/auth", googleRoutes);
 app.use("/user", userRoutes);
+
+// Image proxy: baca file dari disk, kirim dengan header yang benar
+// Menggunakan /img-proxy/:filename agar tidak bentrok dengan /products route
+app.get("/img-proxy/:filename", (req, res) => {
+  const filename = decodeURIComponent(req.params.filename);
+  const filePath = path.join(__dirname, "upload", "products", filename);
+  if (!fs.existsSync(filePath)) {
+    return res.status(404).json({ message: "Image not found" });
+  }
+  const ext = path.extname(filename).toLowerCase();
+  const mimeTypes = {
+    ".jpg": "image/jpeg",
+    ".jpeg": "image/jpeg",
+    ".png": "image/png",
+    ".gif": "image/gif",
+    ".webp": "image/webp",
+  };
+  const contentType = mimeTypes[ext] || "application/octet-stream";
+  res.setHeader("Content-Type", contentType);
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+  res.setHeader("Cache-Control", "public, max-age=86400");
+  fs.createReadStream(filePath).pipe(res);
+});
+
 app.use("/products", productRoutes);
 app.use("/cart", cartRoutes);
 app.use("/shipping", shippingRoutes);

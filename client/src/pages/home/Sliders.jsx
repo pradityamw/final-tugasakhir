@@ -2,6 +2,7 @@ import { Box, Paper } from "@mui/material";
 import Carousel from "react-material-ui-carousel";
 import React from "react";
 import { useGetStoreDataQuery } from "../../state/api/storeApi";
+import NgrokImage from "../../components/NgrokImage";
 
 const Sliders = () => {
   const { data } = useGetStoreDataQuery();
@@ -16,11 +17,10 @@ const Sliders = () => {
             key={index}
             sx={{ width: "100%", height: { xs: 150, md: 300 } }}
           >
-            <img
+            <NgrokImage
               src={image.link}
               alt={`Image - ${index}`}
               style={{ height: "100%", width: "100%", objectFit: "cover" }}
-              loading="lazy"
             />
           </Paper>
         ))}

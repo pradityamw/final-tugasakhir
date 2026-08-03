@@ -9,13 +9,8 @@ const productStorage = multer.diskStorage({
     cb(null, "./upload/products");
   },
   filename: (req, file, cb) => {
-    cb(
-      null,
-      path.parse(file.originalname).name +
-        "-" +
-        Date.now() +
-        path.extname(file.originalname)
-    );
+    const sanitized = path.parse(file.originalname).name.replace(/\s+/g, "-");
+    cb(null, sanitized + "-" + Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -25,12 +20,17 @@ const router = express.Router();
 
 const formatImageLink = (url) => {
   if (!url) return url;
-  if (url.includes("ngrok") && !url.includes("ngrok-skip-browser-warning")) {
-    return url.includes("?")
-      ? `${url}&ngrok-skip-browser-warning=true`
-      : `${url}?ngrok-skip-browser-warning=true`;
+  // Jika URL sudah pakai img-proxy, kembalikan apa adanya
+  if (url.includes("/img-proxy/")) return url;
+  // Ambil nama file dari URL lama (apapun formatnya)
+  try {
+    const urlObj = new URL(url);
+    const parts = urlObj.pathname.split("/");
+    const filename = parts[parts.length - 1];
+    return `${process.env.SERVER}/img-proxy/${encodeURIComponent(decodeURIComponent(filename))}`;
+  } catch {
+    return url;
   }
-  return url;
 };
 
 router.post(
@@ -42,10 +42,7 @@ router.post(
       const images = req.files
         ? req.files.map(
             (img) =>
-              process.env.SERVER +
-              "/products/" +
-              img.filename +
-              "?ngrok-skip-browser-warning=true"
+              process.env.SERVER + "/img-proxy/" + encodeURIComponent(img.filename)
           )
         : [];
 
@@ -206,10 +203,7 @@ router.put(
       if (req.files) {
         images = req.files.map(
           (img) =>
-            process.env.SERVER +
-            "/products/" +
-            img.filename +
-            "?ngrok-skip-browser-warning=true"
+            process.env.SERVER + "/img-proxy/" + encodeURIComponent(img.filename)
         );
       }
 

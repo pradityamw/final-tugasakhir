@@ -1,6 +1,7 @@
 import { Box, Button, IconButton, Portal, Typography } from "@mui/material";
 
 import Appbar from "../../components/appbar/Appbar";
+import NgrokImage from "../../components/NgrokImage";
 import Footer from "../../components/footer/Footer";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { orange } from "@mui/material/colors";
@@ -90,7 +91,7 @@ const DetailProduct = () => {
                 width: { xs: 300, md: 300 },
               }}
             >
-              <img
+              <NgrokImage
                 src={
                   data?.image[imageIndex]
                     ? data?.image[imageIndex].link
