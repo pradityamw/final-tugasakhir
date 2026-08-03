@@ -23,6 +23,16 @@ const uploadImg = multer({ storage: productStorage }).array("image", 10);
 
 const router = express.Router();
 
+const formatImageLink = (url) => {
+  if (!url) return url;
+  if (url.includes("ngrok") && !url.includes("ngrok-skip-browser-warning")) {
+    return url.includes("?")
+      ? `${url}&ngrok-skip-browser-warning=true`
+      : `${url}?ngrok-skip-browser-warning=true`;
+  }
+  return url;
+};
+
 router.post(
   "/add-product",
   authenticate(["admin"]),
@@ -31,7 +41,11 @@ router.post(
     try {
       const images = req.files
         ? req.files.map(
-            (img) => process.env.SERVER + "/products/" + img.filename
+            (img) =>
+              process.env.SERVER +
+              "/products/" +
+              img.filename +
+              "?ngrok-skip-browser-warning=true"
           )
         : [];
 
@@ -111,7 +125,18 @@ router.get("/show-products", async (req, res, next) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
 
-    res.status(200).json(products);
+    const formattedProducts = products.map((prod) => {
+      const p = prod.toObject();
+      if (p.image && Array.isArray(p.image)) {
+        p.image = p.image.map((img) => ({
+          ...img,
+          link: formatImageLink(img.link),
+        }));
+      }
+      return p;
+    });
+
+    res.status(200).json(formattedProducts);
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
@@ -128,7 +153,15 @@ router.get("/:name", async (req, res, next) => {
       return res.status(404).json({ message: "Produk tidak ditemukan" });
     }
 
-    res.status(200).json(product);
+    const p = product.toObject();
+    if (p.image && Array.isArray(p.image)) {
+      p.image = p.image.map((img) => ({
+        ...img,
+        link: formatImageLink(img.link),
+      }));
+    }
+
+    res.status(200).json(p);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -172,7 +205,11 @@ router.put(
 
       if (req.files) {
         images = req.files.map(
-          (img) => process.env.SERVER + "/products/" + img.filename
+          (img) =>
+            process.env.SERVER +
+            "/products/" +
+            img.filename +
+            "?ngrok-skip-browser-warning=true"
         );
       }
 
