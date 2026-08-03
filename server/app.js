@@ -1,3 +1,11 @@
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+dotenv.config({ path: path.join(__dirname, ".env") });
+
 import bodyParser from "body-parser";
 import express from "express";
 import cors from "cors";
@@ -17,11 +25,6 @@ import storeRoutes from "./routes/StoreRoutes.js";
 import chatRoutes from "./routes/chatRoutes.js";
 
 import { Strategy as GoogleStrategy } from "passport-google-oauth2";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 
