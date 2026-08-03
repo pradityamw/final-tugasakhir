@@ -5,6 +5,10 @@ export const paymentApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_BASE_URL}/payment`,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     getToken: builder.mutation({

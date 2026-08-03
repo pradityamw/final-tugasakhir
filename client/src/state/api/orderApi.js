@@ -6,6 +6,10 @@ export const orderApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_BASE_URL}/order`,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     createOrder: builder.mutation({

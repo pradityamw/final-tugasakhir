@@ -102,7 +102,10 @@ const AddProduct = () => {
     if (error) {
       iziToast.error({
         title: "Error",
-        message: error?.data.message,
+        message:
+          error?.data?.message ||
+          error?.data?.error ||
+          "Gagal menambahkan produk",
         position: "topRight",
         timeout: 3000,
       });

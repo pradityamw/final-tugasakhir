@@ -5,6 +5,10 @@ export const cartApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_BASE_URL}/cart`,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     myCart: builder.query({

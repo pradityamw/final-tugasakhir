@@ -7,6 +7,10 @@ export const shipmentApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_BASE_URL}/shipping`,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     getProvinces: builder.query({

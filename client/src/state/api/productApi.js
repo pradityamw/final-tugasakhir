@@ -5,6 +5,10 @@ export const productApi = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${import.meta.env.VITE_BASE_URL}/products`,
     credentials: "include",
+    prepareHeaders: (headers) => {
+      headers.set("ngrok-skip-browser-warning", "true");
+      return headers;
+    },
   }),
   tagTypes: ["Products", "Product"],
   endpoints: (builder) => ({

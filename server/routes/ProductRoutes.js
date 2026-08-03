@@ -29,32 +29,34 @@ router.post(
   uploadImg,
   async (req, res) => {
     try {
-      const images = req.files.map(
-        (img) => process.env.SERVER + "/products/" + img.filename
-      );
+      const images = req.files
+        ? req.files.map(
+            (img) => process.env.SERVER + "/products/" + img.filename
+          )
+        : [];
 
       const { name, desc, category, price, capital, stock, weight } = req.body;
 
-      const profit = price - capital;
+      const profit = Number(price || 0) - Number(capital || 0);
 
       const product = await Product.create({
         name: name,
         desc: desc,
         category: category,
-        price: price,
-        capital: capital,
+        price: Number(price),
+        capital: Number(capital),
         profit: profit,
-        stock: stock,
-        weight: weight,
+        stock: Number(stock),
+        weight: Number(weight),
         image: images.map((link) => ({ link })),
       });
 
       if (!product)
-        return res.status(500).json({ error: "Produk gagal ditambahkan" });
+        return res.status(500).json({ message: "Produk gagal ditambahkan" });
 
       res.status(200).json({ message: "Produk berhasil ditambahkan", product });
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ message: error.message });
     }
   }
 );
