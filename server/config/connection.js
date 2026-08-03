@@ -1,11 +1,4 @@
 import mongoose from "mongoose";
-import dns from "dns";
-
-try {
-  dns.setServers(["8.8.8.8", "1.1.1.1"]);
-} catch (e) {
-  // ignore if dns servers cannot be overridden
-}
 
 const connect = async (req, res) => {
   try {
