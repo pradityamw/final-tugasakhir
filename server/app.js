@@ -28,6 +28,11 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth2";
 
 const app = express();
 
+app.use((req, res, next) => {
+  res.setHeader("ngrok-skip-browser-warning", "true");
+  next();
+});
+
 app.use(
   cors({
     origin: process.env.DOMAIN,
@@ -46,7 +51,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: false,
+      secure: true,
+      sameSite: "none",
       httpOnly: true,
       maxAge: 3 * 24 * 60 * 60 * 1000,
     },

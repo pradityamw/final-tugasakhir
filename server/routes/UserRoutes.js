@@ -44,14 +44,19 @@ router.post("/register", async (req, res) => {
       req.body.password,
       (err, user) => {
         if (err) {
-          return res.status(500).json({ message: err.message });
+          return res.status(400).json({ message: err.message });
         } else {
           const token = genereateToken(user);
 
           res
             .status(200)
-            .cookie("token", token)
-            .json({ mesaage: "Pendaftaran berhasil" });
+            .cookie("token", token, {
+              httpOnly: true,
+              secure: true,
+              sameSite: "none",
+              maxAge: 3 * 24 * 60 * 60 * 1000,
+            })
+            .json({ message: "Pendaftaran berhasil" });
         }
       }
     );
@@ -77,7 +82,15 @@ router.post("/login", async (req, res) => {
           }
           const token = genereateToken(user);
 
-          res.status(200).cookie("token", token).json({ isLogin: true, user });
+          res
+            .status(200)
+            .cookie("token", token, {
+              httpOnly: true,
+              secure: true,
+              sameSite: "none",
+              maxAge: 3 * 24 * 60 * 60 * 1000,
+            })
+            .json({ isLogin: true, user });
         });
       }
     })(req, res);
@@ -257,8 +270,11 @@ router.post("/send-email", async (req, res) => {
 
 router.post("/logout", (req, res) => {
   try {
-    res.cookie("token", null, {
-      expiresIn: new Date(Date.now()),
+    res.cookie("token", "", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      expires: new Date(0),
     });
 
     res.status(200).json({ message: "Berhasil logout" });

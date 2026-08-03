@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
 axios.defaults.baseURL = import.meta.env.VITE_BASE_URL;
+axios.defaults.headers.common["ngrok-skip-browser-warning"] = "true";
 
 const config = {
   headers: {
@@ -25,7 +26,9 @@ export const loginUser = createAsyncThunk(
 
       return data.user;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -38,7 +41,9 @@ export const register = createAsyncThunk(
 
       return data.message;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -55,7 +60,9 @@ export const updateProfile = createAsyncThunk(
 
       return data.message;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.error);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.error || error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -72,7 +79,9 @@ export const updatePassword = createAsyncThunk(
 
       return data.message;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -92,7 +101,9 @@ export const uploadAvatar = createAsyncThunk(
 
       return data.message;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -105,7 +116,9 @@ export const loadUser = createAsyncThunk(
 
       return data;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
@@ -118,7 +131,9 @@ export const logoutUser = createAsyncThunk(
 
       return data.message;
     } catch (error) {
-      return thunkApi.rejectWithValue(error.response.data.message);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || error.message
+      );
     }
   }
 );
