@@ -121,7 +121,7 @@ const UploadProducts = ({ open, close }) => {
               <Button variant="outlined" onClick={downloadTemplate} fullWidth>
                 Download Excel Template
               </Button>
-              <Input type="file" fullWidth required onChange={inputHandler} inputProps={{ accept: ".xlsx, .xls" }} />
+              <Input type="file" fullWidth required onChange={inputHandler} inputProps={{ accept: ".xlsx, .xls, .csv" }} />
             </>
           )}
         </Box>

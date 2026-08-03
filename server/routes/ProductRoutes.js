@@ -65,21 +65,35 @@ router.post("/upload-products", authenticate(["admin"]), async (req, res) => {
   try {
     const { data } = req.body;
 
+    if (!Array.isArray(data)) {
+      return res.status(400).json({ message: "Format data tidak valid" });
+    }
+
     const validData = data.filter(
-      (item) => item[0] !== null && item[0] !== undefined
+      (item) =>
+        Array.isArray(item) &&
+        item[0] !== null &&
+        item[0] !== undefined &&
+        String(item[0]).trim() !== ""
     );
 
     await Promise.all(
       validData.map(async (item) => {
+        const capital = Number(item[2]) || 0;
+        const price = Number(item[3]) || 0;
+        const profit = Number(item[4]) || price - capital;
+        const stock = Number(item[5]) || 0;
+        const weight = Number(item[6]) || 0;
+
         await Product.create({
-          name: item[0],
-          category: item[1],
-          capital: item[2],
-          price: item[3],
-          profit: item[4],
-          stock: item[5],
-          weight: item[6],
-          desc: item[7],
+          name: String(item[0]).trim(),
+          category: String(item[1] || "Umum").trim(),
+          capital: capital,
+          price: price,
+          profit: profit,
+          stock: stock,
+          weight: weight,
+          desc: String(item[7] || "").trim(),
         });
       })
     );
