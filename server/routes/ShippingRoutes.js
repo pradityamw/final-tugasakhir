@@ -3,22 +3,22 @@ import { authenticate } from "../middleware/authenticate.js";
 import axios from "axios";
 import qs from "qs";
 
-axios.defaults.baseURL = process.env.RAJAONGKIR_URL;
-axios.defaults.headers.common["Key"] = process.env.RAJAONGKIR;
-axios.defaults.headers.post["Content-Type"] =
-  "Application/x-www-form-urlencoded";
+const rajaongkir = axios.create({
+  baseURL: process.env.RAJAONGKIR_URL || "https://rajaongkir.komerce.id/api/v1/",
+  headers: {
+    key: process.env.RAJAONGKIR || "oWy5D4Z923173389859eb332OEO1U7vH",
+    Key: process.env.RAJAONGKIR || "oWy5D4Z923173389859eb332OEO1U7vH",
+  },
+});
 
 const router = express.Router();
 
 router.get("/provinces", authenticate(["user", "admin"]), async (req, res) => {
   try {
-    // Memanggil endpoint API RajaOngkir untuk destinasi provinsi
-    const response = await axios.get("/destination/province");
-
+    const response = await rajaongkir.get("/destination/province");
     res.status(200).json(response.data.data);
   } catch (error) {
-    // Penanganan error jika request gagal
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 
@@ -28,12 +28,10 @@ router.get(
   async (req, res) => {
     try {
       const id = req.params.province_id;
-
-      const cities = await axios.get(`/destination/city/${id}`);
-
+      const cities = await rajaongkir.get(`/destination/city/${id}`);
       res.status(200).json(cities.data.data);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ message: error.message });
     }
   }
 );
@@ -44,12 +42,10 @@ router.get(
   async (req, res) => {
     try {
       const id = req.params.city_id;
-
-      const district = await axios.get(`/destination/district/${id}`);
-
+      const district = await rajaongkir.get(`/destination/district/${id}`);
       res.status(200).json(district.data.data);
     } catch (error) {
-      return res.status(500).json({ error: error.message });
+      return res.status(500).json({ message: error.message });
     }
   }
 );
@@ -63,10 +59,14 @@ router.get("/cost/:origin/:destination/:weight/:courier", async (req, res) => {
       destination: destination,
       weight: weight,
       courier: courier,
-      price: "lowest"
+      price: "lowest",
     });
 
-    const cost = await axios.post("/calculate/district/domestic-cost", data);
+    const cost = await rajaongkir.post("/calculate/district/domestic-cost", data, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
 
     const results = cost.data.data;
 
@@ -76,7 +76,7 @@ router.get("/cost/:origin/:destination/:weight/:courier", async (req, res) => {
 
     res.status(200).json(results);
   } catch (error) {
-    return res.status(500).json({ error: error });
+    return res.status(500).json({ message: error.message });
   }
 });
 

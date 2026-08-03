@@ -18,7 +18,12 @@ import SendIcon from "@mui/icons-material/Send";
 import { io } from "socket.io-client";
 import { useGetChatHistoryQuery } from "../../../state/api/chatApi";
 
-const socket = io(import.meta.env.VITE_BASE_URL, { withCredentials: true });
+const socket = io(import.meta.env.VITE_BASE_URL, {
+  withCredentials: true,
+  extraHeaders: {
+    "ngrok-skip-browser-warning": "true",
+  },
+});
 
 const ChatPage = () => {
   const [selectedUser, setSelectedUser] = useState(null);

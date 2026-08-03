@@ -119,15 +119,18 @@ router.get("/show-products", async (req, res, next) => {
 
 router.get("/:name", async (req, res, next) => {
   try {
-    const product = await Product.findOne({ name: req.params.name });
+    const decodedName = decodeURIComponent(req.params.name);
+    const product = await Product.findOne({
+      $or: [{ name: decodedName }, { name: req.params.name }],
+    });
 
     if (!product) {
-      return res.status(404).json({ error: "Produk tidak ditemukan" });
+      return res.status(404).json({ message: "Produk tidak ditemukan" });
     }
 
     res.status(200).json(product);
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 

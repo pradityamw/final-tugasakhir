@@ -18,7 +18,12 @@ import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import { useGetChatHistoryQuery } from "../../../state/api/chatApi";
 
-const socket = io(import.meta.env.VITE_BASE_URL, { withCredentials: true });
+const socket = io(import.meta.env.VITE_BASE_URL, {
+  withCredentials: true,
+  extraHeaders: {
+    "ngrok-skip-browser-warning": "true",
+  },
+});
 
 const Chat = () => {
   const { user, isAuth } = useSelector((state) => state.auth);
