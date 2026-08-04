@@ -76,16 +76,27 @@ const NgrokImage = ({ src, alt, className, style, ...props }) => {
   }, [src]);
 
   const handleError = () => {
-    // Jika currentSrc yang dipakai (misal ngrok fallback) juga gagal
-    if (currentSrc && currentSrc.includes("ngrok")) {
-      try {
-        const urlObj = new URL(currentSrc);
-        const fallback = `${getBaseUrl()}${urlObj.pathname}`;
-        if (fallback !== currentSrc) {
-          setCurrentSrc(fallback);
-          return;
-        }
-      } catch (e) {}
+    if (currentSrc) {
+      const baseUrl = getBaseUrl();
+      if (currentSrc.includes("ngrok")) {
+        try {
+          const urlObj = new URL(currentSrc);
+          const fallback = `${baseUrl}${urlObj.pathname}`;
+          if (fallback !== currentSrc) {
+            setCurrentSrc(fallback);
+            return;
+          }
+        } catch (e) {}
+      } else if (!currentSrc.startsWith(baseUrl) && currentSrc.includes("/img-proxy/")) {
+        try {
+          const urlObj = new URL(currentSrc);
+          const fallback = `${baseUrl}${urlObj.pathname}`;
+          if (fallback !== currentSrc) {
+            setCurrentSrc(fallback);
+            return;
+          }
+        } catch (e) {}
+      }
     }
     setError(true);
   };

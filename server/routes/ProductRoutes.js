@@ -18,9 +18,17 @@ const uploadImg = multer({ storage: productStorage }).array("image", 10);
 
 const router = express.Router();
 
-const formatImageLink = (url) => {
+const formatImageLink = (url, req) => {
   if (!url) return url;
-  const baseUrl = process.env.SERVER || "http://localhost:2000";
+  let baseUrl = process.env.SERVER || "http://localhost:2000";
+  if (req) {
+    const protocol = req.protocol === "https" || req.get("x-forwarded-proto") === "https" ? "https" : "http";
+    const host = req.get("host");
+    if (host) {
+      baseUrl = `${protocol}://${host}`;
+    }
+  }
+
   try {
     let filename = "";
     if (typeof url === "string" && (url.startsWith("http://") || url.startsWith("https://"))) {
@@ -134,7 +142,7 @@ router.get("/show-products", async (req, res, next) => {
       if (p.image && Array.isArray(p.image)) {
         p.image = p.image.map((img) => ({
           ...img,
-          link: formatImageLink(img.link),
+          link: formatImageLink(img.link, req),
         }));
       }
       return p;
@@ -161,7 +169,7 @@ router.get("/:name", async (req, res, next) => {
     if (p.image && Array.isArray(p.image)) {
       p.image = p.image.map((img) => ({
         ...img,
-        link: formatImageLink(img.link),
+        link: formatImageLink(img.link, req),
       }));
     }
 
