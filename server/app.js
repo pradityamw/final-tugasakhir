@@ -34,9 +34,27 @@ app.use((req, res, next) => {
   next();
 });
 
+const allowedOrigins = [
+  process.env.DOMAIN,
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "http://localhost:5174",
+  "http://127.0.0.1:5173",
+];
+
 app.use(
   cors({
-    origin: process.env.DOMAIN,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.endsWith(".vercel.app") ||
+        origin.includes("ngrok")
+      ) {
+        return callback(null, true);
+      }
+      return callback(null, true);
+    },
     credentials: true,
   })
 );

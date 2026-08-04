@@ -1,85 +1,71 @@
 import { useState, useEffect } from "react";
 
 /**
- * NgrokImage - komponen gambar yang menembus Ngrok browser warning,
- * dan secara otomatis menangani fallback jika URL ngrok mati / offline.
+ * NgrokImage - Komponen gambar yang otomatis menangani:
+ * 1. Ngrok browser warning (menggunakan fetch + blob URL)
+ * 2. URL biasa / localhost / data URL (langsung <img> tag)
+ * 3. Fallback jika URL ngrok mati (otomatis ganti ke VITE_BASE_URL)
  */
 const NgrokImage = ({ src, alt, className, style, ...props }) => {
+  const [currentSrc, setCurrentSrc] = useState(null);
   const [blobUrl, setBlobUrl] = useState(null);
   const [error, setError] = useState(false);
-  const [directSrc, setDirectSrc] = useState(null);
+
+  const getBaseUrl = () => import.meta.env.VITE_BASE_URL || "http://localhost:2000";
 
   useEffect(() => {
     setError(false);
     setBlobUrl(null);
-    setDirectSrc(null);
+    setCurrentSrc(null);
 
     if (!src) {
       setError(true);
       return;
     }
 
+    const isNgrok = typeof src === "string" && src.includes("ngrok");
+
+    // Jika bukan ngrok (localhost, data URL, relative path, atau domain standar)
+    if (!isNgrok) {
+      if (typeof src === "string" && src.startsWith("/")) {
+        setCurrentSrc(`${getBaseUrl()}${src}`);
+      } else {
+        setCurrentSrc(src);
+      }
+      return;
+    }
+
+    // Jika URL adalah Ngrok, fetch dengan header bypass agar tidak kena warning page
     let objectUrl = null;
     let isMounted = true;
 
-    const tryFetch = async (targetUrl, isNgrok) => {
-      const headers = isNgrok ? { "ngrok-skip-browser-warning": "true" } : {};
-      const response = await fetch(targetUrl, { headers });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-      return await response.blob();
-    };
-
-    const fetchImage = async () => {
+    const fetchNgrokImage = async () => {
       try {
-        const isNgrok = typeof src === "string" && src.includes("ngrok");
-        let blob;
+        const response = await fetch(src, {
+          headers: { "ngrok-skip-browser-warning": "true" },
+        });
 
-        try {
-          blob = await tryFetch(src, isNgrok);
-        } catch (primaryErr) {
-          // Jika URL ngrok mati / error, coba fallback ke local VITE_BASE_URL
-          const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:2000";
-          if (isNgrok) {
-            try {
-              const urlObj = new URL(src);
-              const fallbackUrl = `${baseUrl}${urlObj.pathname}`;
-              blob = await tryFetch(fallbackUrl, false);
-            } catch (fallbackErr) {
-              throw primaryErr;
-            }
-          } else if (typeof src === "string" && src.startsWith("/")) {
-            const fallbackUrl = `${baseUrl}${src}`;
-            blob = await tryFetch(fallbackUrl, false);
-          } else {
-            throw primaryErr;
-          }
-        }
-
-        if (isMounted && blob) {
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        if (isMounted) {
           objectUrl = URL.createObjectURL(blob);
           setBlobUrl(objectUrl);
         }
       } catch (err) {
+        // Jika fetch Ngrok gagal (misal domain ngrok mati), fallback ke VITE_BASE_URL
         if (isMounted) {
-          // Jika fetch blob gagal, fallback ke direct src
-          let finalDirect = src;
-          const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:2000";
-          if (typeof src === "string" && src.includes("ngrok")) {
-            try {
-              const urlObj = new URL(src);
-              finalDirect = `${baseUrl}${urlObj.pathname}`;
-            } catch (e) {}
+          try {
+            const urlObj = new URL(src);
+            const fallback = `${getBaseUrl()}${urlObj.pathname}`;
+            setCurrentSrc(fallback);
+          } catch (e) {
+            setError(true);
           }
-          setDirectSrc(finalDirect);
         }
       }
     };
 
-    if (typeof src === "string" && (src.startsWith("data:") || src.startsWith("blob:"))) {
-      setDirectSrc(src);
-    } else {
-      fetchImage();
-    }
+    fetchNgrokImage();
 
     return () => {
       isMounted = false;
@@ -89,14 +75,14 @@ const NgrokImage = ({ src, alt, className, style, ...props }) => {
     };
   }, [src]);
 
-  const handleDirectError = () => {
-    const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:2000";
-    if (directSrc && directSrc.includes("ngrok")) {
+  const handleError = () => {
+    // Jika currentSrc yang dipakai (misal ngrok fallback) juga gagal
+    if (currentSrc && currentSrc.includes("ngrok")) {
       try {
-        const urlObj = new URL(directSrc);
-        const fallbackUrl = `${baseUrl}${urlObj.pathname}`;
-        if (fallbackUrl !== directSrc) {
-          setDirectSrc(fallbackUrl);
+        const urlObj = new URL(currentSrc);
+        const fallback = `${getBaseUrl()}${urlObj.pathname}`;
+        if (fallback !== currentSrc) {
+          setCurrentSrc(fallback);
           return;
         }
       } catch (e) {}
@@ -124,20 +110,10 @@ const NgrokImage = ({ src, alt, className, style, ...props }) => {
     );
   }
 
-  if (directSrc) {
-    return (
-      <img
-        src={directSrc}
-        alt={alt || "product"}
-        className={className}
-        style={style}
-        onError={handleDirectError}
-        {...props}
-      />
-    );
-  }
+  // Render blobUrl (untuk Ngrok) atau currentSrc (untuk non-ngrok / fallback)
+  const imageSource = blobUrl || currentSrc;
 
-  if (!blobUrl) {
+  if (!imageSource) {
     return (
       <div
         className={className}
@@ -153,11 +129,11 @@ const NgrokImage = ({ src, alt, className, style, ...props }) => {
 
   return (
     <img
-      src={blobUrl}
+      src={imageSource}
       alt={alt || "product"}
       className={className}
       style={style}
-      onError={handleDirectError}
+      onError={handleError}
       {...props}
     />
   );
