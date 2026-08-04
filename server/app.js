@@ -31,6 +31,11 @@ const app = express();
 
 app.use((req, res, next) => {
   res.setHeader("ngrok-skip-browser-warning", "true");
+  res.cookie("ngrok-skip-browser-warning", "true", {
+    path: "/",
+    maxAge: 31536000000,
+    sameSite: "lax",
+  });
   next();
 });
 

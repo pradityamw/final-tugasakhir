@@ -27,6 +27,10 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
+    try {
+      document.cookie = "ngrok-skip-browser-warning=true; path=/; max-age=31536000; SameSite=Lax";
+    } catch (e) {}
+
     const load = localStorage.getItem("login");
 
     if (load) {

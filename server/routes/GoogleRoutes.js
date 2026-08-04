@@ -12,11 +12,19 @@ function genereateToken(user) {
 
 router.get(
   "/google",
+  (req, res, next) => {
+    res.cookie("ngrok-skip-browser-warning", "true", { path: "/", maxAge: 31536000000 });
+    next();
+  },
   passport.authenticate("google", { scope: ["email", "profile"] })
 );
 
 router.get(
   "/google/ecommerce",
+  (req, res, next) => {
+    res.cookie("ngrok-skip-browser-warning", "true", { path: "/", maxAge: 31536000000 });
+    next();
+  },
   passport.authenticate("google", { failureRedirect: "/" }),
   async (req, res) => {
     if (!req.user) {
@@ -25,7 +33,10 @@ router.get(
 
     const token = genereateToken(req.user);
 
-    res.status(200).cookie("token", token).redirect(process.env.DOMAIN);
+    res
+      .cookie("token", token)
+      .cookie("ngrok-skip-browser-warning", "true", { path: "/", maxAge: 31536000000 })
+      .redirect(process.env.DOMAIN);
   }
 );
 
