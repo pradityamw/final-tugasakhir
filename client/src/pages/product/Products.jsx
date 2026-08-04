@@ -133,7 +133,7 @@ const Products = () => {
           >
             <CardActionArea>
               <NgrokImage
-                src={product.image[0] ? product.image[0].link : defaultImg}
+                src={product?.image?.[0]?.link || null}
                 alt={product.name}
                 style={{ height: "300px", width: "100%", objectFit: "cover" }}
               />

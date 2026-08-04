@@ -32,11 +32,13 @@ const DetailProduct = () => {
   const [imageIndex, setIndex] = useState(0);
 
   const left = () => {
-    setIndex((imageIndex - 1 + data?.image.length) % data?.image.length);
+    if (!data?.image?.length) return;
+    setIndex((imageIndex - 1 + data.image.length) % data.image.length);
   };
 
   const right = () => {
-    setIndex((imageIndex + 1) % data?.image.length);
+    if (!data?.image?.length) return;
+    setIndex((imageIndex + 1) % data.image.length);
   };
 
   return (
@@ -93,9 +95,9 @@ const DetailProduct = () => {
             >
               <NgrokImage
                 src={
-                  data?.image[imageIndex]
-                    ? data?.image[imageIndex].link
-                    : defaultImg
+                  data?.image && data?.image[imageIndex] && data?.image[imageIndex]?.link
+                    ? data.image[imageIndex].link
+                    : null
                 }
                 alt={data?.name}
                 style={{

@@ -20,15 +20,22 @@ const router = express.Router();
 
 const formatImageLink = (url) => {
   if (!url) return url;
-  // Jika URL sudah pakai img-proxy, kembalikan apa adanya
-  if (url.includes("/img-proxy/")) return url;
-  // Ambil nama file dari URL lama (apapun formatnya)
+  const baseUrl = process.env.SERVER || "http://localhost:2000";
   try {
-    const urlObj = new URL(url);
-    const parts = urlObj.pathname.split("/");
-    const filename = parts[parts.length - 1];
-    return `${process.env.SERVER}/img-proxy/${encodeURIComponent(decodeURIComponent(filename))}`;
-  } catch {
+    let filename = "";
+    if (typeof url === "string" && (url.startsWith("http://") || url.startsWith("https://"))) {
+      const urlObj = new URL(url);
+      const parts = urlObj.pathname.split("/");
+      filename = parts[parts.length - 1];
+    } else if (typeof url === "string") {
+      const parts = url.split("/");
+      filename = parts[parts.length - 1];
+    }
+
+    if (!filename) return url;
+    const decoded = decodeURIComponent(filename);
+    return `${baseUrl}/img-proxy/${encodeURIComponent(decoded)}`;
+  } catch (err) {
     return url;
   }
 };
