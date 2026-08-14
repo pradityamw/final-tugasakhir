@@ -31,6 +31,10 @@ function App() {
       document.cookie = "ngrok-skip-browser-warning=true; path=/; max-age=31536000; SameSite=Lax";
     } catch (e) {}
 
+    if (window.location.search.includes("login=success")) {
+      localStorage.setItem("login", JSON.stringify("login"));
+    }
+
     const load = localStorage.getItem("login");
 
     if (load) {

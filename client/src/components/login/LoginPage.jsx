@@ -61,9 +61,10 @@ const LoginPage = () => {
   const googleLogin = () => {
     try {
       document.cookie = "ngrok-skip-browser-warning=true; path=/; max-age=31536000; SameSite=Lax";
+      document.cookie = `redirect_origin=${window.location.origin}; path=/; max-age=600; SameSite=Lax`;
     } catch (e) {}
-    location.href = `${import.meta.env.VITE_BASE_URL}/auth/google`;
     localStorage.setItem("login", JSON.stringify("login"));
+    location.href = `${import.meta.env.VITE_BASE_URL}/auth/google`;
   };
 
   return (

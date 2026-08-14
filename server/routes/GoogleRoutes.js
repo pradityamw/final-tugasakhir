@@ -32,11 +32,17 @@ router.get(
     }
 
     const token = genereateToken(req.user);
+    const targetDomain = req.cookies.redirect_origin || process.env.DOMAIN || "http://localhost:5173";
 
     res
-      .cookie("token", token)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        maxAge: 3 * 24 * 60 * 60 * 1000,
+      })
       .cookie("ngrok-skip-browser-warning", "true", { path: "/", maxAge: 31536000000 })
-      .redirect(process.env.DOMAIN);
+      .redirect(`${targetDomain}/?login=success`);
   }
 );
 
