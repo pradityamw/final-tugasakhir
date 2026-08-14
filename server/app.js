@@ -28,6 +28,7 @@ import chatRoutes from "./routes/chatRoutes.js";
 import { Strategy as GoogleStrategy } from "passport-google-oauth2";
 
 const app = express();
+app.set("trust proxy", 1);
 
 app.use((req, res, next) => {
   res.setHeader("ngrok-skip-browser-warning", "true");
@@ -105,7 +106,9 @@ passport.use(
     {
       clientID: process.env.CLIENT_ID,
       clientSecret: process.env.CLIENT_SECRET,
-      callbackURL: "/auth/google/ecommerce",
+      callbackURL: process.env.SERVER
+        ? `${process.env.SERVER.replace(/\/$/, "")}/auth/google/ecommerce`
+        : "/auth/google/ecommerce",
       userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo",
       scope: ["profile", "email"],
     },
