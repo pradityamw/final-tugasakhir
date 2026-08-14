@@ -62,7 +62,7 @@ const LoginPage = () => {
     try {
       document.cookie = "ngrok-skip-browser-warning=true; path=/; max-age=31536000; SameSite=Lax";
     } catch (e) {}
-    location.href = `${import.meta.env.VITE_BASE_URL}/auth/google/ecommerce`;
+    location.href = `${import.meta.env.VITE_BASE_URL}/auth/google`;
     localStorage.setItem("login", JSON.stringify("login"));
   };
 
