@@ -51,25 +51,37 @@ io.on("connection", (socket) => {
           message: AUTO_REPLY_MESSAGE,
           sender: "admin",
           recipient: message.sender,
+          isAutoReply: true,
         });
         io.emit("chatMessage", autoReply);
       } else {
-        // Pesan berikutnya: cek apakah admin sudah membalas sejak pesan terakhir user
-        // Cari pesan terakhir dalam conversation ini (selain pesan yang baru dikirim)
-        const lastMessage = await Chat.findOne({
-          $or: [
-            { sender: message.sender },
-            { sender: "admin", recipient: message.sender },
-          ],
+        // Pesan berikutnya: cek apakah admin sudah membalas secara manual
+        // Cari balasan manual admin terakhir (bukan auto-reply)
+        const lastRealAdminReply = await Chat.findOne({
+          sender: "admin",
+          recipient: message.sender,
+          isAutoReply: { $ne: true },
+        }).sort({ _id: -1 });
+
+        // Cari pesan user sebelum pesan yang baru dikirim
+        const lastUserMessage = await Chat.findOne({
+          sender: message.sender,
           _id: { $ne: chat._id },
         }).sort({ _id: -1 });
 
-        // Jika pesan terakhir sebelumnya juga dari user → admin belum balas → kirim antrian
-        if (lastMessage && lastMessage.sender === message.sender) {
+        // Admin belum balas jika: tidak ada balasan manual ATAU
+        // balasan manual terakhir lebih lama dari pesan user sebelumnya
+        const adminHasReplied =
+          lastRealAdminReply &&
+          lastUserMessage &&
+          lastRealAdminReply._id.toString() > lastUserMessage._id.toString();
+
+        if (!adminHasReplied) {
           const queueReply = await Chat.create({
             message: QUEUE_MESSAGE,
             sender: "admin",
             recipient: message.sender,
+            isAutoReply: true,
           });
           io.emit("chatMessage", queueReply);
         }
