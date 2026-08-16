@@ -219,7 +219,7 @@ const Order = ({ subtotal, totalWeight, products }) => {
         timeout: 3000,
       });
       reset();
-      navigate("/");
+      navigate("/order");
     }
   }, [isSuccess, orderResponse, reset, navigate]);
 
