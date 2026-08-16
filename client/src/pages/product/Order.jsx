@@ -290,7 +290,7 @@ const Order = ({ product }) => {
         timeout: 3000,
       });
       reset();
-      navigate("/");
+      navigate("/order");
     }
   }, [isSuccess, orderData, reset, navigate]);
 
