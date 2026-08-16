@@ -27,6 +27,7 @@ const io = new Server(server, {
 
 const ADMIN_WHATSAPP = "6285954082545";
 const AUTO_REPLY_MESSAGE = `Mohon ditunggu ya, admin akan membalas pesanmu dalam 5 menit. Jika admin tidak merespon, kamu bisa menghubungi kami langsung via WhatsApp: https://wa.me/${ADMIN_WHATSAPP}`;
+const QUEUE_MESSAGE = "Mohon ditunggu yaa, chatmu dalam proses antrian untuk dibalas 🙏";
 
 io.on("connection", (socket) => {
   socket.on("chatMessage", async (message) => {
@@ -38,21 +39,40 @@ io.on("connection", (socket) => {
 
     io.emit("chatMessage", chat);
 
-    // Cek apakah ini pesan pertama user (hanya dari sisi sender = user, bukan admin)
+    // Cek apakah ini pesan dari user (bukan admin)
     if (message.sender !== "admin") {
       const userMessageCount = await Chat.countDocuments({
         sender: message.sender,
       });
 
-      // Jika ini pesan pertama user, kirim auto-reply dari admin
       if (userMessageCount === 1) {
+        // Pesan pertama: kirim auto-reply sambutan
         const autoReply = await Chat.create({
           message: AUTO_REPLY_MESSAGE,
           sender: "admin",
           recipient: message.sender,
         });
-
         io.emit("chatMessage", autoReply);
+      } else {
+        // Pesan berikutnya: cek apakah admin sudah membalas sejak pesan terakhir user
+        // Cari pesan terakhir dalam conversation ini (selain pesan yang baru dikirim)
+        const lastMessage = await Chat.findOne({
+          $or: [
+            { sender: message.sender },
+            { sender: "admin", recipient: message.sender },
+          ],
+          _id: { $ne: chat._id },
+        }).sort({ _id: -1 });
+
+        // Jika pesan terakhir sebelumnya juga dari user → admin belum balas → kirim antrian
+        if (lastMessage && lastMessage.sender === message.sender) {
+          const queueReply = await Chat.create({
+            message: QUEUE_MESSAGE,
+            sender: "admin",
+            recipient: message.sender,
+          });
+          io.emit("chatMessage", queueReply);
+        }
       }
     }
   });
