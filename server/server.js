@@ -25,6 +25,9 @@ const io = new Server(server, {
   },
 });
 
+const ADMIN_WHATSAPP = "6285954082545";
+const AUTO_REPLY_MESSAGE = `Mohon ditunggu ya, admin akan membalas pesanmu dalam 5 menit. Jika admin tidak merespon, kamu bisa menghubungi kami langsung via WhatsApp: https://wa.me/${ADMIN_WHATSAPP}`;
+
 io.on("connection", (socket) => {
   socket.on("chatMessage", async (message) => {
     const chat = await Chat.create({
@@ -34,6 +37,24 @@ io.on("connection", (socket) => {
     });
 
     io.emit("chatMessage", chat);
+
+    // Cek apakah ini pesan pertama user (hanya dari sisi sender = user, bukan admin)
+    if (message.sender !== "admin") {
+      const userMessageCount = await Chat.countDocuments({
+        sender: message.sender,
+      });
+
+      // Jika ini pesan pertama user, kirim auto-reply dari admin
+      if (userMessageCount === 1) {
+        const autoReply = await Chat.create({
+          message: AUTO_REPLY_MESSAGE,
+          sender: "admin",
+          recipient: message.sender,
+        });
+
+        io.emit("chatMessage", autoReply);
+      }
+    }
   });
 
   socket.on("disconnect", () => {

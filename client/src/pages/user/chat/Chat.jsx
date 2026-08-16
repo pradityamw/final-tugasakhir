@@ -38,6 +38,27 @@ const Chat = () => {
   const isDrawerOpen = useRef(null);
   const chatEndRef = useRef(null);
 
+  // Fungsi untuk render pesan dengan link yang bisa diklik
+  const renderMessage = (text) => {
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const parts = text.split(urlRegex);
+    return parts.map((part, i) =>
+      urlRegex.test(part) ? (
+        <a
+          key={i}
+          href={part}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ color: "#1976d2", wordBreak: "break-all" }}
+        >
+          {part}
+        </a>
+      ) : (
+        part
+      )
+    );
+  };
+
   const toggleDrawer = () => {
     setOpen(!open);
 
@@ -141,7 +162,11 @@ const Chat = () => {
                 >
                   <ListItemText
                     primary={chatMessage.sender}
-                    secondary={chatMessage.message}
+                    secondary={
+                      <span style={{ whiteSpace: "pre-wrap" }}>
+                        {renderMessage(chatMessage.message)}
+                      </span>
+                    }
                     sx={{
                       textAlign:
                         chatMessage.sender === "admin" ? "right" : "left",
@@ -149,7 +174,7 @@ const Chat = () => {
                         chatMessage.sender === "admin" ? "#e0e0e0" : "#f5f5f5",
                       padding: 1,
                       borderRadius: 1,
-                      maxWidth: "60%",
+                      maxWidth: "80%",
                     }}
                   />
                 </ListItem>
@@ -168,7 +193,11 @@ const Chat = () => {
               >
                 <ListItemText
                   primary={chatMessage.sender}
-                  secondary={chatMessage.message}
+                  secondary={
+                    <span style={{ whiteSpace: "pre-wrap" }}>
+                      {renderMessage(chatMessage.message)}
+                    </span>
+                  }
                   sx={{
                     textAlign:
                       chatMessage.sender === "admin" ? "right" : "left",
@@ -176,7 +205,7 @@ const Chat = () => {
                       chatMessage.sender === "admin" ? "#e0e0e0" : "#f5f5f5",
                     padding: 1,
                     borderRadius: 1,
-                    maxWidth: "60%",
+                    maxWidth: "80%",
                   }}
                 />
               </ListItem>
