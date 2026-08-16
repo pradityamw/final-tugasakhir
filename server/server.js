@@ -29,6 +29,9 @@ const ADMIN_WHATSAPP = "6285954082545";
 const AUTO_REPLY_MESSAGE = `Mohon ditunggu ya, admin akan membalas pesanmu dalam 5 menit. Jika admin tidak merespon, kamu bisa menghubungi kami langsung via WhatsApp: https://wa.me/${ADMIN_WHATSAPP}`;
 const QUEUE_MESSAGE = "Mohon ditunggu yaa, chatmu dalam proses antrian untuk dibalas 🙏";
 
+// Map untuk melacak timer antrian per user: username -> timeoutId
+const pendingAntrian = new Map();
+
 io.on("connection", (socket) => {
   socket.on("chatMessage", async (message) => {
     const chat = await Chat.create({
@@ -46,7 +49,7 @@ io.on("connection", (socket) => {
       });
 
       if (userMessageCount === 1) {
-        // Pesan pertama: kirim auto-reply sambutan
+        // Pesan pertama: kirim auto-reply sambutan langsung
         const autoReply = await Chat.create({
           message: AUTO_REPLY_MESSAGE,
           sender: "admin",
@@ -55,36 +58,43 @@ io.on("connection", (socket) => {
         });
         io.emit("chatMessage", autoReply);
       } else {
-        // Pesan berikutnya: cek apakah admin sudah membalas secara manual
-        // Cari balasan manual admin terakhir (bukan auto-reply)
-        const lastRealAdminReply = await Chat.findOne({
-          sender: "admin",
-          recipient: message.sender,
-          isAutoReply: { $ne: true },
-        }).sort({ _id: -1 });
-
-        // Cari pesan user sebelum pesan yang baru dikirim
-        const lastUserMessage = await Chat.findOne({
-          sender: message.sender,
-          _id: { $ne: chat._id },
-        }).sort({ _id: -1 });
-
-        // Admin belum balas jika: tidak ada balasan manual ATAU
-        // balasan manual terakhir lebih lama dari pesan user sebelumnya
-        const adminHasReplied =
-          lastRealAdminReply &&
-          lastUserMessage &&
-          lastRealAdminReply._id.toString() > lastUserMessage._id.toString();
-
-        if (!adminHasReplied) {
-          const queueReply = await Chat.create({
-            message: QUEUE_MESSAGE,
-            sender: "admin",
-            recipient: message.sender,
-            isAutoReply: true,
-          });
-          io.emit("chatMessage", queueReply);
+        // Pesan ke-2 dan seterusnya: reset timer, tunggu 1 menit dulu
+        // Kalau user kirim pesan lagi sebelum 1 menit, timer di-reset
+        if (pendingAntrian.has(message.sender)) {
+          clearTimeout(pendingAntrian.get(message.sender));
         }
+
+        // Simpan _id pesan ini untuk dicek nanti setelah 1 menit
+        const currentChatId = chat._id.toString();
+        const username = message.sender;
+
+        const timeoutId = setTimeout(async () => {
+          pendingAntrian.delete(username);
+
+          // Cek apakah admin sudah membalas secara manual sejak pesan ini dikirim
+          const lastRealAdminReply = await Chat.findOne({
+            sender: "admin",
+            recipient: username,
+            isAutoReply: { $ne: true },
+          }).sort({ _id: -1 });
+
+          // Admin sudah balas jika ada balasan manual yang lebih baru dari pesan user ini
+          const adminHasReplied =
+            lastRealAdminReply &&
+            lastRealAdminReply._id.toString() > currentChatId;
+
+          if (!adminHasReplied) {
+            const queueReply = await Chat.create({
+              message: QUEUE_MESSAGE,
+              sender: "admin",
+              recipient: username,
+              isAutoReply: true,
+            });
+            io.emit("chatMessage", queueReply);
+          }
+        }, 60 * 1000); // Tunggu 1 menit
+
+        pendingAntrian.set(username, timeoutId);
       }
     }
   });
