@@ -213,63 +213,58 @@ router.put(
   uploadImg,
   async (req, res) => {
     try {
-      let images = [];
+      let newUploadedImages = [];
 
-      if (req.files) {
-        images = req.files.map(
+      if (req.files && req.files.length > 0) {
+        newUploadedImages = req.files.map(
           (img) =>
-            process.env.SERVER + "/img-proxy/" + encodeURIComponent(img.filename)
+            (process.env.SERVER || "") + "/img-proxy/" + encodeURIComponent(img.filename)
         );
       }
 
       let product = await Product.findById(req.params.id);
+      if (!product) {
+        return res.status(404).json({ message: "Produk tidak ditemukan" });
+      }
 
       const { name, desc, category, price, capital, stock, weight, image } =
         req.body;
 
-      const profit = price - capital;
+      const profit = Number(price || 0) - Number(capital || 0);
 
-      let data;
-
-      if (images.length > 0) {
-        data = {
-          name: name,
-          desc: desc,
-          category: category,
-          price: price,
-          capital: capital,
-          profit: profit,
-          stock: stock,
-          weight: weight,
-          image: images.map((link) => ({ link })),
-        };
-      } else {
-        let imageList = [];
-        if (Array.isArray(image)) {
-          imageList = image;
-        } else if (typeof image === "string" && image.trim() !== "") {
-          imageList = [image];
-        }
-
-        data = {
-          name: name,
-          desc: desc,
-          category: category,
-          price: price,
-          capital: capital,
-          profit: profit,
-          stock: stock,
-          weight: weight,
-          image: imageList.map((link) => ({ link })),
-        };
+      let existingImages = [];
+      if (Array.isArray(image)) {
+        existingImages = image.filter(
+          (link) => typeof link === "string" && link.trim() !== ""
+        );
+      } else if (typeof image === "string" && image.trim() !== "") {
+        existingImages = [image.trim()];
       }
+
+      // Gabungkan gambar lama yang dipertahankan dan gambar baru yang baru diupload
+      let combinedImages = [
+        ...existingImages.map((link) => ({ link })),
+        ...newUploadedImages.map((link) => ({ link })),
+      ];
+
+      const data = {
+        name: name,
+        desc: desc,
+        category: category,
+        price: Number(price),
+        capital: Number(capital),
+        profit: profit,
+        stock: Number(stock),
+        weight: Number(weight),
+        image: combinedImages,
+      };
 
       product = await Product.findByIdAndUpdate(req.params.id, data, {
         new: true,
         runValidators: true,
       });
 
-      res.status(200).json({ message: "Produk berhasil diperbarui" });
+      res.status(200).json({ message: "Produk berhasil diperbarui", product });
     } catch (error) {
       console.log(error);
       if (error.name === "CastError") {
